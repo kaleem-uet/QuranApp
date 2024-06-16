@@ -1,118 +1,71 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Surahs from './src/pages/surah';
+import SurahRecitation from './src/components/versesOfSurah';
+import { StatusBar } from 'react-native';
+import SurahsRecitation from './src/pages/audio';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+const Drawer = createDrawerNavigator();
+const Stack = createNativeStackNavigator();
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+function MyDrawer() {
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+    <Drawer.Navigator initialRouteName="Surahs" screenOptions={{
+      headerStyle: {
+        backgroundColor: '#863ED5', // Change header background color
+      },
+      headerTintColor: '#fff', // Change header text color
+      headerTitleStyle: {
+        fontWeight: 'bold', // Change header title text style
+      },
+    }}>
+      <Drawer.Screen name="Surahs" component={Surahs} />
+      <Drawer.Screen name="Surahs Recitation" component={SurahsRecitation} />
+
+    </Drawer.Navigator>
   );
 }
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
+function MyStack() {
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#863ED5', // Change header background color
+        },
+        headerTintColor: '#fff', // Change header text color
+        headerTitleStyle: {
+          fontWeight: 'bold', // Change header title text style
+        },
+      }}
+    >
+      <Stack.Screen
+        name="surah"
+        component={MyDrawer}
+        options={{ headerShown: false }} // Hide the header for the drawer navigator
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <Stack.Screen
+        name="SurahRecitation"
+        component={SurahRecitation}
+        options={({ route }) => ({
+          title: route.params.surahName, // Dynamically set the title based on route params
+        })}
+      />
+    </Stack.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
-export default App;
+export default function App() {
+  return (
+    <NavigationContainer>
+      <StatusBar
+     animated={true}
+     backgroundColor="#863ED5"
+     barStyle="light-content"
+   />
+      <MyStack />
+    </NavigationContainer>
+  );
+}
