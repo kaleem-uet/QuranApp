@@ -42,7 +42,7 @@ function ListOfSurah() {
     <ScrollView style={styles.container}>
       {surahs.map((surah) => (
         <TouchableOpacity key={surah.number} 
-        onPress={() => navigation.navigate('SurahRecitation', {
+        onPress={() => navigation.navigate('SurahTranslation', {
           surahId: surah.number,
           surahName:surah.englishName,
           arabicName:surah.name,

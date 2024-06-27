@@ -5,65 +5,44 @@ import { fetchSurahById } from '../../utils/api';
 import Verse from '../global/Verse';
 import SurahInfo from '../global/SurahInfo';
 import axios from 'axios';
-import AudioPlay from '../global/AudioPlay';
 
 type Ayah = {
   number: number;
   audio: string;
-  audioSecondary: string[];
   text: string;
   numberInSurah: number;
-  juz: number;
-  manzil: number;
-  page: number;
-  ruku: number;
-  hizbQuarter: number;
   sajda: boolean;
 };
 
 type Surah = {
   ayahs: Ayah[];
-  edition: {
-    direction: string | null;
-    englishName: string;
-    format: string;
-    identifier: string;
-    language: string;
-    name: string;
-    type: string;
-  };
-  englishName: string;
-  englishNameTranslation: string;
-  name: string;
-  number: number;
-  numberOfAyahs: number;
-  revelationType: string;
 };
 
-type SurahRecitationProps = {
-  route: RouteProp<{ params: { surahId: number; surahName: string,arabicName:string,numberOfAyahs:string ,revelationType:string} }, 'params'>;
+type SurahTranslationProps = {
+  route: RouteProp<{ params: { surahId: number; surahName: string; arabicName: string; numberOfAyahs: string; revelationType: string; } }, 'params'>;
 };
 
-const Item: React.FC<{ ayah: Ayah }> = ({ ayah }) => (
+const Item: React.FC<{ ayah: Ayah, translation: string }> = ({ ayah, translation }) => (
   <View style={styles.item}>
-    <Verse ayah={ayah.text} verseNo={ayah.numberInSurah} ayahAudio={ayah.audio} sajda={ayah.sajda} />
+    <Verse ayah={ayah.text} verseNo={ayah.numberInSurah} ayahAudio={ayah.audio} sajda={ayah.sajda} translation={translation} />
   </View>
 );
 
-const SurahRecitation: React.FC<SurahRecitationProps> = ({ route }) => {
-  const { surahId, surahName ,arabicName,numberOfAyahs,revelationType} = route.params;
+const SurahTranslation: React.FC<SurahTranslationProps> = ({ route }) => {
+  const { surahId, surahName, arabicName, numberOfAyahs, revelationType } = route.params;
   const [surah, setSurah] = useState<Surah | null>(null);
   const [loading, setLoading] = useState(true);
-  const [audioUrl, setAudioUrl] = useState('');
+  const [translations, setTranslations] = useState<string[]>([]);
+  const [selectedLanguage, setSelectedLanguage] = useState<number | string>('en.asad');
 
   useEffect(() => {
     const fetchSurah = async () => {
       try {
         const res = await fetchSurahById(surahId);
         setSurah(res);
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching Surah:', error);
+      } finally {
         setLoading(false);
       }
     };
@@ -71,23 +50,17 @@ const SurahRecitation: React.FC<SurahRecitationProps> = ({ route }) => {
     fetchSurah();
   }, [surahId]);
 
-
   useEffect(() => {
     axios.get(`https://api.quran.com/api/v4/chapter_recitations/1/${surahId}`)
-      .then((res) => {
-        setAudioUrl(res.data.audio_file.audio_url);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      .then(res => setAudioUrl(res.data.audio_file.audio_url))
+      .catch(error => console.log(error));
   }, [surahId]);
 
-
-
-
-
-
-
+  useEffect(() => {
+    axios.get(`https://api.alquran.cloud/v1/surah/${surahId}/${selectedLanguage}`)
+      .then(res => setTranslations(res.data.data.ayahs.map(ayah => ayah.text)))
+      .catch(error => console.log("Error fetching translations:", error));
+  }, [selectedLanguage]);
 
   if (loading) {
     return (
@@ -107,11 +80,10 @@ const SurahRecitation: React.FC<SurahRecitationProps> = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <AudioPlay audioUrl={audioUrl}/>
       <FlatList
-        ListHeaderComponent={<SurahInfo arabicName={arabicName} surahId={surahId} surahName={surahName} numberOfAyahs={numberOfAyahs} revelationType={revelationType} />}
+        ListHeaderComponent={<SurahInfo setSelectedLanguage={setSelectedLanguage} selectedLanguage={selectedLanguage} arabicName={arabicName} surahId={surahId} surahName={surahName} numberOfAyahs={numberOfAyahs} revelationType={revelationType} />}
         data={surah.ayahs}
-        renderItem={({ item }) => <Item ayah={item} />}
+        renderItem={({ item, index }) => <Item ayah={item} translation={translations[index]} />}
         keyExtractor={(item) => item.number.toString()}
       />
     </View>
@@ -122,7 +94,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    padding:10,
+    padding: 10,
   },
   loadingContainer: {
     flex: 1,
@@ -136,4 +108,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SurahRecitation;
+export default SurahTranslation;

@@ -3,9 +3,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Surahs from './src/pages/surah';
-import SurahRecitation from './src/components/versesOfSurah';
 import { StatusBar } from 'react-native';
-import SurahsRecitation from './src/pages/audio';
+import SurahsRecitation from './src/pages/recitation';
+import SurahTranslation from './src/components/SurahTranslation';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -47,8 +47,8 @@ function MyStack() {
         options={{ headerShown: false }} // Hide the header for the drawer navigator
       />
       <Stack.Screen
-        name="SurahRecitation"
-        component={SurahRecitation}
+        name="SurahTranslation"
+        component={SurahTranslation}
         options={({ route }) => ({
           title: route.params.surahName, // Dynamically set the title based on route params
         })}

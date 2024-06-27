@@ -1,18 +1,17 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Button, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Sound from 'react-native-sound';
-import RNFS from 'react-native-fs';
 import { getAudio } from '../../utils/api';
 
 interface verseProps {
   ayah: string,
   verseNo: number,
   ayahAudio: string,
-  sajda: boolean
+  sajda: boolean,
+  translation:string
 }
-export default function Verse({ ayah, verseNo, ayahAudio, sajda }: verseProps) {
+export default function Verse({ ayah, verseNo, ayahAudio, sajda,translation }: verseProps) {
   const [sound, setSound] = useState<Sound | null>(null);
-  const [isLoop, setIsLoop] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
 
@@ -94,11 +93,12 @@ export default function Verse({ ayah, verseNo, ayahAudio, sajda }: verseProps) {
       </View>
       <View style={{ marginTop: 20 }}>
         <Text style={styles.verseTranslation}>
-          [All] praise is [due] to Allah, Lord of the worlds
+         {translation}
         </Text>
       </View>
 
       <View style={styles.divider} />
+
     </View>
   )
 }
